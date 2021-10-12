@@ -1,6 +1,6 @@
 package com.wistron.springboot.springbootlearn.domain.enums;
 
-public enum AduitStatusEnum {
+public enum AuditStatusEnum {
     /**
      *   待审核
      */

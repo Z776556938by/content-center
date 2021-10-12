@@ -5,6 +5,7 @@
 #info.author=lucas
 #info.email=xx@email
 
+
 spring:
   datasource:
     url: jdbc:mysql://rm-bp19y5ow28vo3bh2exo.mysql.rds.aliyuncs.com:3306/content_center
@@ -19,11 +20,21 @@ spring:
         namespace: 7cf55ebe-8005-4c48-a506-36b219d8ae62
         cluster-name: ZJ
     sentinel:
-#      filter:
+#      filter:N
 #        enabled: false
       # 指定 sentinel 控制台的地址
       transport:
         dashboard: localhost:8080
+    stream:
+      rocketmq:
+        binder:
+          name-server: 127.0.0.1:9876
+      bindings:
+        send-out-0:
+          # 用于指定topic
+          destination: stream-test-topic
+    function:
+      definition: send
   application:
     name: content-center
 
@@ -64,8 +75,16 @@ feign:
 
 #  暴露所有web端口   这里为了进行暴露 sentinel服务端口
 management:
+  endpoint:
+    health:
+      show-details: always
   endpoints:
     web:
       exposure:
         #需要注意 yml中需要 加上''
         include: '*'
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+#    坑： 必须指定group
+    group: test-group

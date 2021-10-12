@@ -47,7 +47,11 @@
 			<artifactId>mapper-spring-boot-starter</artifactId>
 			<version>2.1.5</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>11.2.0.3</version>
+		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -81,14 +85,24 @@
 		<dependency>
 			<groupId>com.alibaba.cloud</groupId>
 			<artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId></groupId>
-					<artifactId></artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
-<!--		<dependency>-->
+		<dependency>
+			<groupId>org.apache.rocketmq</groupId>
+			<artifactId>rocketmq-spring-boot-starter</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-stream-rocketmq</artifactId>
+			<version>0.9.0.RELEASE</version>
+		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--		<dependency>-->
 <!--			<groupId>com.alibaba.csp</groupId>-->
 <!--			<artifactId>spring-boot-starter-ahas-sentinel-client</artifactId>-->
 <!--			<version>1.9.6</version>-->
@@ -151,6 +165,14 @@
 						<version>1.18.12</version>
 					</dependency>
 				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>11</source>
+					<target>11</target>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

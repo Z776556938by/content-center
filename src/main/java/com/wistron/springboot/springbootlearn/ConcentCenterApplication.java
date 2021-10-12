@@ -18,9 +18,11 @@ import tk.mybatis.spring.annotation.MapperScan;
 @MapperScan("com.wistron")
 @EnableFeignClients
 @SpringBootApplication
+//@EnableBinding(Source.class)
 /*
 @LoadBalancerClient(name = "user-center", configuration = UserCenterConfiguration.class)
 */
+
 public class ConcentCenterApplication {
 
 	private final WebClient.Builder loadBalancedWebClientBuilder;
