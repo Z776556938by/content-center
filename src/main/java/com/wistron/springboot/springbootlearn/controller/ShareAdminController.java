@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ShareAdminController {
     private final ShareService shareService;
+
     @PutMapping("audit/{id}")
     public Share auditById(@PathVariable Integer id, @RequestBody ShareAuditDTO shareAuditDTO) {
-            // TODO  认证、授权
-        return shareService.auditById(id,shareAuditDTO);
+        // TODO  认证、授权
+        return shareService.auditById(id, shareAuditDTO);
     }
 }
