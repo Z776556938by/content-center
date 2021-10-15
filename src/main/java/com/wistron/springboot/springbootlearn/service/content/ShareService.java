@@ -1,6 +1,5 @@
 package com.wistron.springboot.springbootlearn.service.content;
 
-import com.alibaba.fastjson.JSON;
 import com.wistron.springboot.springbootlearn.dao.content.RocketmqTransactionLogMapper;
 import com.wistron.springboot.springbootlearn.dao.content.ShareMapper;
 import com.wistron.springboot.springbootlearn.domain.dto.content.ShareAuditDTO;
@@ -17,8 +16,7 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.apache.rocketmq.spring.support.RocketMQHeaders;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,9 +69,6 @@ public class ShareService {
         return shareDTO;
     }
 
-    //  这里直接装配一个桥 用来连接rocket 或者kafka 替代rocketmq发送消息
-    private final StreamBridge streamBridge;
-
     public Share auditById(Integer id, ShareAuditDTO shareAuditDTO) {
         // 检查share是否存在 不存在或当前audit_status != NOT_YET 抛出异常
         Share share = shareMapper.selectByPrimaryKey(id);
@@ -88,8 +83,9 @@ public class ShareService {
         if (AuditStatusEnum.PASS.equals(shareAuditDTO.getAuditStatusEnum())) {
             // 发送半消息  group  topic  message
             String transactionId = UUID.randomUUID().toString();
-
-            streamBridge.send("addBonus-out-0",
+            this.rocketMQTemplate.sendMessageInTransaction(
+                    "tx-add-bonus-group",
+                    "add-bonus",
                     MessageBuilder.withPayload(
                                     UserAddBonusMsgDTO
                                             .builder()
@@ -100,27 +96,10 @@ public class ShareService {
                             //  Header有妙用 实现RocketMQLocalTransactionListener后通过这获取对应的RocketMQ事务状态与获取变量
                             .setHeader(RocketMQHeaders.TRANSACTION_ID, transactionId)
                             .setHeader("share_id", id)
-                            .setHeader("share_DTO", JSON.toJSON(shareAuditDTO))
-                            .build()
+                            .build(),
+                    // arg用处 对应实现RocketMQLocalTransactionListener 中的 Object o
+                    shareAuditDTO
             );
-//              rocketMQTemplate 进行发送事务消息 用arg 传参
-//            this.rocketMQTemplate.sendMessageInTransaction(
-//                    "tx-add-bonus-group",
-//                    "add-bonus",
-//                    MessageBuilder.withPayload(
-//                                    UserAddBonusMsgDTO
-//                                            .builder()
-//                                            .userId(share.getUserId())
-//                                            .bonus(50)
-//                                            .build()
-//                            )
-//                            //  Header有妙用 实现RocketMQLocalTransactionListener后通过这获取对应的RocketMQ事务状态与获取变量
-//                            .setHeader(RocketMQHeaders.TRANSACTION_ID, transactionId)
-//                            .setHeader("share_id", id)
-//                            .build(),
-//                    // arg用处 对应实现RocketMQLocalTransactionListener 中的 Object o
-//                    shareAuditDTO
-//            );
         } else {
             // 如果是 REJECT 直接更新数据库
             this.auditByIdInDB(id, shareAuditDTO);

@@ -29,15 +29,12 @@ spring:
       rocketmq:
         binder:
           name-server: 127.0.0.1:9876
-        bindings:
-          addBonus-out-0:
-            producer:
-              group: tx-add-bonus-group
-              transactional: true
       bindings:
-        addBonus-out-0:
+        send-out-0:
           # 用于指定topic
-          destination: add-bonus
+          destination: stream-test-topic
+    function:
+      definition: send
   application:
     name: content-center
 
